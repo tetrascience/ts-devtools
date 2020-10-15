@@ -1,6 +1,5 @@
 import typing as t
 import typing_extensions as te
-from dataclasses import dataclass, field
 
 
 FileCategory = te.Literal["IDS", "RAW", "PROCESSED"]
@@ -16,10 +15,6 @@ class File(te.TypedDict, total=False):
     version: t.Optional[str]
 
 
-class Options(te.TypedDict, total=False):
-    is_stream: t.Optional[bool]
-
-
 class Result(te.TypedDict):
     metadata: t.Dict[str, str]
     body: bytes
@@ -27,14 +22,21 @@ class Result(te.TypedDict):
     custom_tags: t.List[str]
 
 
-@dataclass
 class Context:
     """A development-time version of the context object that is passed into
-    the task script handler when running as part of a pipeline."""
+    the task script handler when running as part of a pipeline.
+    """
 
-    _storage: t.Dict[str, Result] = field(init=False, repr=False, default_factory=dict)
+    def __init__(self):
+        self._storage = {}
+        self._pipeline_config = {}
 
-    def read_file(self, file: File, options: Options = {}) -> Result:
+    @property
+    def pipeline_config(self) -> t.Dict[str, str]:
+        """Pipeline configuration including secrets."""
+        return self._pipeline_config
+
+    def read_file(self, file: File) -> Result:
         return self._storage[file["fileKey"]]
 
     def write_file(
@@ -47,21 +49,18 @@ class Context:
         custom_tags: t.List[str],
         source_type: str,
     ) -> File:
-        file: File = {
-            "type": "s3",
-            "bucket": "fake-unittest-bucket",
-            "fileKey": file_name,
-        }
-
-        self._storage[(file["bucket"], file["fileKey"])] = {
-            "metadata": {"TS_IDS": ids, "TS_SOURCE_TYPE": source_type,},
+        self._storage[file_name] = {
+            "metadata": {
+                "TS_IDS": ids,
+                "TS_SOURCE_TYPE": source_type,
+                "TS_FILE_CATEGORY": file_category,
+            },
             "body": content,
             "custom_metadata": custom_metadata,
             "custom_tags": custom_tags,
         }
-        return file
-
-
-def foo(input: File, context: Context):
-    context.read_file(input, {"is_stream": True})
-
+        return {
+            "type": "s3",
+            "bucket": "fake-unittest-bucket",
+            "fileKey": file_name,
+        }
