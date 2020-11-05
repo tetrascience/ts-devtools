@@ -26,7 +26,7 @@ def check_test_output(
     local file. Optionally transforms the file contents before comparing
     (for example, to ignore whitespace and text ordering for JSON files).
 
-    >>> check_test_output(ctx, base_dir / 'expected.json', output_file, json.load)    
+    >>> check_test_output(ctx, base_dir / 'expected.json', output_file, json.loads)    
     """
     with open(local_path, "rb") as f:
         expected = f.read()
