@@ -49,6 +49,8 @@ class Context:
         custom_tags: t.List[str] = None,
         source_type: str = None,
     ) -> File:
+        if type(content) == str:
+            content = content.encode('UTF-8')
         self._storage[file_name] = {
             "metadata": {
                 "TS_IDS": ids,
