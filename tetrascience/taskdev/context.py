@@ -44,10 +44,10 @@ class Context:
         content: bytes,
         file_name: str,
         file_category: FileCategory,
-        ids: str,
-        custom_metadata: t.Dict[str, str],
-        custom_tags: t.List[str],
-        source_type: str,
+        ids: str = None,
+        custom_metadata: t.Dict[str, str] = None,
+        custom_tags: t.List[str] = None,
+        source_type: str = None,
     ) -> File:
         self._storage[file_name] = {
             "metadata": {
