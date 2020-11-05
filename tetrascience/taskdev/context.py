@@ -41,7 +41,7 @@ class Context:
 
     def write_file(
         self,
-        content: bytes,
+        content: t.AnyStr,
         file_name: str,
         file_category: FileCategory,
         ids: str = None,
