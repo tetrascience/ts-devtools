@@ -66,3 +66,14 @@ class Context:
             "bucket": "fake-unittest-bucket",
             "fileKey": file_name,
         }
+    
+    # always return true in local context
+    def validate_ids(
+        self,
+        data: dict,
+        namespace: str,
+        slug: str,
+        version: str
+    ) -> bool:
+        return True
+
